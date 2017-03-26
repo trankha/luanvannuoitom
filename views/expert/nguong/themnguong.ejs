@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include partials/head.ejs %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/plugins/ckeditor/ckeditor.js" type="text/javascript"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var sock = "";
+      var socket = io.connect("<%=conf%>");
+      sock = socket;
+      var datatype = '';
+      var region = '';
+      var age = '';
+      var species = '';
+      $(document).ready(function(){
+        loadDataTypeForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(item,data){
+          datatype += "<option value='" + -1 +"'>Chọn loại dữ liệu</option>";
+          item.forEach(function(it){
+            data[it].forEach(function(items){
+              datatype += "<option value='" + items.datatype_id +"'>" + items.datatype_name +"</option>";
+            });
+          });
+          
+          $("#datatype_id").html(datatype);
+        });
+        loadRegionByUserIdForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',function(data){
+          region += "<option value='" + -1 +"'>Chọn vùng</option>";
+          data.forEach(function(items){
+            region += "<option value='" + items.region_id +"'>" + items.region_name +"</option>";
+          });
+          $("#region_id").html(region);
+        });
+        loadAgeForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(data){
+          age += "<option value='" + -1 +"'>Chọn độ tuổi</option>";
+          data.forEach(function(items){
+            age += "<option value='" + items.age_id +"'>" + items.age_description +"</option>";
+          });
+          $("#age_id").html(age);
+        });
+        loadSpeciesForAddThreshold('<%=conf%>','<%=token%>','<%=secu%>',function(data){
+          species += "<option value='" + -1 +"'>Chọn loài thả nuôi</option>";
+          data.forEach(function(items){
+            species += "<option value='" + items.species_id +"'>" + items.species_name +"</option>";
+          });
+          $("#species_id").html(species);
+        });
+      });
+    </script>
+  </head>
+  <body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock);getNotification('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',0,10);countNotification(sock,'<%=userid%>');" class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
+      <% include partials/nav.ejs %>
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Thêm ngưỡng
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li>
+              
+            </li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <!-- Start main activity -->
+            <div class="modal fade" tabindex="-1" id="modalNotifi" role="dialog" aria-labelledby="gridSystemModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-title" id="gridSystemModalLabel"></h4>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <p class="DateCreated"></p>
+                        <p class="RegionName"></p>
+                        <p class="StationName"></p>
+                        <p class="DataTypeName"></p>   
+                        <p class="DataValue"></p>
+                        <p class="ThresholdLevel"></p>
+                        <p class="ThresholdMessage"></p>
+                        <h3>Lời khuyên</h3>
+                        <p class="AdviceMessage"></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                  </div>
+                </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+            <div class="padding-top-bottom"></div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="panel panel-primary">
+                  <div class="panel-heading text-center">
+                    <span id="tieude" style="font-weight:bold;color:white;font-size:16px;">Thêm ngưỡng</span>
+                  </div>
+                  <div class="panel-body">
+                    <!-- Bo the  table-responsive do bi trung css giua bootstrap aminlte2 va sbadmin-->
+                    <!-- <div class="table-responsive"> -->
+                      <form name="" action="/chuyengia/nguong/themnguong" method="post">
+                        <table class="table table-bordered">
+                          <tr>
+                          <td class="text-right" style="font-weight:bold;">Loại dữ liệu:</td>
+                            <td>
+                              <select name="datatype_id" id="datatype_id">
+                                
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Vùng:</td>
+                            <td>
+                              <select name="region_id" id="region_id">
+                                
+                              </select>
+                            </td>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Độ tuổi của tôm:</td>
+                            <td>
+                              <select name="age_id" id="age_id">
+                                
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Loại giống:</td>
+                            <td>
+                              <select name="species_id" id="species_id">
+                              </select>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Tên ngưỡng:</td>
+                            <td>
+                              <input type="text" class="form-control" placeholder="Nhập tên ngưỡng" name="threshold_name" id="threshold_name"/>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Giá trị bắt đầu:</td>
+                            <td>
+                              <input type="text" class="form-control" placeholder="Nhập giá trị bắt đầu" name="threshold_start" id="threshold_start"/>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Giá trị kết thúc:</td>
+                            <td>
+                              <input type="text" class="form-control" placeholder="Nhập giá trị kết thúc" name="threshold_end" id="threshold_end"/>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Cấp độ:</td>
+                            <td>
+                              <input type="text" class="form-control" placeholder="Nhập cấp độ" name="threshold_level" id="threshold_level"/>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Nội dung của ngưỡng:</td>
+                            <td>
+                              <textarea cols="80" rows="5" name="threshold_message" id="threshold_message"></textarea>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Thời gian cảnh báo:</td>
+                            <td>
+                              <input type="text" class="form-control" placeholder="Nhập thời gian" name="threshold_timeWarning" id="threshold_timeWarning"/>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-right" style="font-weight:bold;">Loại ngưỡng:</td>
+                            <td>
+                              <input checked="checked" type="radio" name="threshold_type" value="0"> Ngưỡng cho sông<br>
+                              <input type="radio" name="threshold_type" value="1"> Ngưỡng cho ao<br>
+                              <input type="radio" name="threshold_type" value=""> Khác
+                            </td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td><input type="submit" class="btn btn-info" name="btnThemNguong" value="Thêm"/></td>
+                          </tr>
+                        </table>
+                      </form>
+                    <!-- </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+      <footer class="footer-title main-footer">
+        <div class="pull-right hidden-xs">
+          <b>Phiên bản</b> 1.0
+        </div>
+        <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+      </footer>
+      <% include partials/scripts.ejs %>
+      <!-- Control Sidebar -->
+      <% include partials/sidebar.ejs %>
+    </div>
+  <!-- ./wrapper -->
+  </body>
+<!-- jQuery 2.2.3 -->
+
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include partials/head.ejs %>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript">
+    // bien toan cuc luu doi tuong stationListener duoc chon
+    var _dataType = [];
+    var sock = ""; //bien chua ket noi socket
+    var index = 0; //vi tri bat dau lay thong bao
+    var size = 10; //so thong bao
+    var socket = io.connect("<%=conf%>"); //<%=conf%> chua duong dan socket
+    sock = socket;
+  </script>
+  
+</head>
+<body onload="loadFIRST('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock);getNotification('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',index,size);countNotification(sock,'<%=userid%>')"; class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include partials/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Xem dữ liệu đo
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+        <li><a href="/quanly/dulieu/xemdodo">Xem độ đo</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <div class="padding-top-bottom">
+      <div class="row">
+        <div class="col-md-3">
+          <!-- Được gọi khi người dùng là quản lý cấp tỉnh-->
+          <select id="selectPROVINCE" style="display: none;" class="form-control" onchange="loadDISTRICT('<%=conf%>','<%=token%>','<%=secu%>',sock,0);">
+          </select>
+          <!-- Được gọi khi người dùng là quản lý cấp huyện-->
+          <select id="selectDISTRICT" style="display: none;" class="form-control" onchange="loadWARD1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);">
+          </select>
+          <!-- Được gọi khi người dùng là quản lý cấp xã-->
+          <select id="selectWARD" style="display: none;" class="form-control" onchange="loadREG1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);">
+          </select>
+          <select id="selectREG3" style="display: none;" onchange="loadSTATION1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);" class="form-control">
+            <option value="-1">Chọn vùng</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <!-- Được gọi khi người dùng chọn selectPROVINCE-->
+          <select id="selectDISTRICT1" style="display: none;" class="form-control" onchange="loadWARD1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);">
+          </select>
+          <!-- Được gọi khi người dùng chọn selectDISTRICT-->
+          <select id="selectWARD1" style="display: none;" class="form-control" onchange="loadREG1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);">
+          </select>
+          <!-- Được gọi khi người dùng chọn selectWARD-->
+          <select id="selectREG" style="display: none;" onchange="loadSTATION1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);" class="form-control">
+            <option value="-1">Chọn vùng</option>
+          </select>
+          <select id="selectSTATION3" style="display: none;" onchange="loadDATA('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <!-- Được gọi khi người dùng chọn selectDISTRICT1-->
+          <select id="selectWARD2" style="display: none;" class="form-control" onchange="loadREG1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);">
+          </select>
+          <!-- Được gọi khi người dùng chọn selectWARD1-->
+          <select id="selectREG1" style="display: none;" onchange="loadSTATION1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);" class="form-control">
+            <option value="-1">Chọn vùng</option>
+          </select>
+          <!-- Được gọi khi người dùng chọn selectREG-->
+          <select id="selectSTATION" style="display: none;" onchange="loadDATA('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+          <select id="selectLOCATION3" onchange="loadSELECTEDLOCATION('<%=conf%>','<%=token%>','<%=secu%>');" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí cần xem</option>
+            <option value="1">Xem ở ao</option>
+            <option value="2">Xem ở sông</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+        <!-- Được gọi khi người dùng chọn selectWARD2-->
+          <select id="selectREG2" style="display: none;" onchange=" loadSTATION1('<%=conf%>','<%=token%>','<%=secu%>',sock,0);" class="form-control">
+            <option value="-1">Chọn vùng</option>
+          </select>
+          <!-- Được gọi khi người dùng chọn selectREG1-->
+          <select id="selectSTATION1" style="display: none;" onchange="loadDATA('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+          <!-- Duoc goi khi xai select LOCATION3 -->
+          <select id="selectPOND3" style="display: none;" onchange="loadDATAbyPOND('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+          <!--khi chon selectLOCATION3 -->
+          <select id="selectRIVER3" onchange="loadDATAbyRIVER('<%=conf%>','<%=token%>','<%=secu%>',sock);" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí trên sông</option>
+          </select>
+          <!-- KHi chon tram cam tay tay xa -->
+          <select id="selectLOCATION2" onchange="loadSELECTEDLOCATION('<%=conf%>','<%=token%>','<%=secu%>');" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí cần xem</option>
+            <option value="1">Xem ở ao</option>
+            <option value="2">Xem ở sông</option>
+          </select>
+        </div>
+      </div>
+      <div class="padding-top-bottom">
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <!-- Được gọi khi người dùng chọn selectREG2-->
+          <select id="selectLOCATION1" onchange="loadSELECTEDLOCATION('<%=conf%>','<%=token%>','<%=secu%>');" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí cần xem</option>
+            <option value="1">Xem ở ao</option>
+            <option value="2">Xem ở sông</option>
+          </select>
+          <!-- Được gọi khi người dùng chọn selectREG-->
+          <select id="selectPOND" style="display: none;" onchange="loadDATAbyPOND('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+          <select id="selectRIVER2" onchange="loadDATAbyRIVER('<%=conf%>','<%=token%>','<%=secu%>',sock);" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí trên sông</option>
+          </select>
+          <select id="selectSTATION2" style="display: none;" onchange="loadDATA('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <!-- Được gọi khi người dùng chọn selectREG1-->
+          <select id="selectPOND1" style="display: none;" onchange="loadDATAbyPOND('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+          <!-- Được gọi khi người dùng chọn xem ở sông  -->
+          <select id="selectRIVER1" onchange="loadDATAbyRIVER('<%=conf%>','<%=token%>','<%=secu%>',sock);" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí trên sông</option>
+          </select>
+          <select id="selectLOCATION" onchange="loadSELECTEDLOCATION('<%=conf%>','<%=token%>','<%=secu%>');" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí cần xem</option>
+            <option value="1">Xem ở ao</option>
+            <option value="2">Xem ở sông</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select id="selectPOND2" style="display: none;" onchange="loadDATAbyPOND('<%=conf%>','<%=token%>','<%=secu%>',sock);" class="form-control">
+            <option value="-1">Chọn trạm</option>
+          </select>
+          <select id="selectRIVER" onchange="loadDATAbyRIVER('<%=conf%>','<%=token%>','<%=secu%>',sock);" style="display: none;" class="form-control">
+            <option value="-1">Chọn vị trí trên sông</option>
+          </select>
+        </div>
+        <div class="col-md-3 text-right">
+          <div class="form-group">
+            <label>Xem biểu đồ: </label>
+            <input type="checkbox" id="btnDisplayChart" data-toggle="toggle" onchange="changeOnOffChart('<%=conf%>','<%=token%>','<%=secu%>');" data-on="Bật" data-off="Tắt" data-onstyle="info" data-offstyle="default">
+          </div>
+        </div>
+      </div>
+     
+      <div class="padding-top-bottom">
+      </div>
+	  <div class="row">
+  		<div class="col-md-12">
+  			<div style="display: none;" id="ErrorMessage" class="alert alert-danger">
+  				<!-- Hiển thị thông báo lỗi khi load dữ liệu không được -->
+  			</div>
+  	  </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="box box-primary">
+          <div class="box-header text-center with-border">
+          <h3 class="box-title" id="tieude">Số liệu đo</h3>
+            <div class="box-tools pull-right">
+              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <div class="row">
+              <div class="col-md-12">
+                <table class="table table-striped table-hover table-bordered text-center">
+                  <thead>
+                    <tr class="titile-table-data">
+                      <th >Độ đo</th>
+                      <th>Giá trị</th>
+                      <th>Đơn vị</th>
+                      <th>Thời gian đo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hienthi">
+                    <div id="autoplay">
+                      <audio id="auplay" controls>
+                        <source src="/audio/CANHBAO.mp3" type="audio/mpeg">
+                      </audio>
+                    </div>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- /.row -->
+          </div>
+      </div>
+    </div>
+      <!-- /.box-body -->
+      <!-- <div class="row">
+        <div class="col-lg-12">
+          <div id="panel-title" class="panel panel-default">
+            <div class="panel-heading text-center">
+              <span id="tieude">Các thông số đo</span>
+            </div>
+            <div class="panel-body">
+              <table class="table table-striped table-hover table-bordered text-center">
+                <thead>
+                  <tr class="titile-table-data">
+                    <th >Độ đo</th>
+                    <th>Giá trị</th>
+                    <th>Đơn vị</th>
+                    <th>Thời gian đo</th>
+                  </tr>
+                </thead>
+                <tbody id="hienthi">
+                  <div id="autoplay">
+                    <audio id="auplay" controls>
+                      <source src="/audio/CANHBAO.mp3" type="audio/mpeg">
+                    </audio>
+                  </div>
+                </body>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> -->
+      <div style="display: none;" id="displayChart" class="row">
+        <div class="col-md-12">
+          <div class="panel panel-primary">
+            <div class="panel-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div style="display: none;" id="displayerror" class="alert alert-danger">
+                    <!-- Hiển thị thông báo lỗi khi không có dữ liệu đo -->
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-9">
+                <div id="chart">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <div id="radioDataType"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Ngày bắt đầu:</label>
+                      <div class="input-group date">
+                        <div class="input-group-addon">
+                          <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" class="form-control pull-right" id="start_date">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Ngày kết thúc:</label>
+                      <div class="input-group date">
+                        <div class="input-group-addon">
+                          <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" class="form-control pull-right" id="end_date">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <button id="btnXemBieuDo" class="btn btn-primary btn-block" onclick="viewdependenceDate('<%=conf%>','<%=token%>','<%=secu%>');">Xem biểu đồ</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" tabindex="-1" id="modalNotifi" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="modal-title" id="gridSystemModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <p class="DateCreated"></p>
+                  <p class="RegionName"></p>
+                  <p class="StationName"></p>
+                  <p class="DataTypeName"></p>   
+                  <p class="DataValue"></p>
+                  <p class="ThresholdLevel"></p>
+                  <p class="ThresholdMessage"></p>
+                  <h3>Lời khuyên</h3>
+                  <p class="AdviceMessage"></p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include partials/scripts.ejs %>
+  <% include partials/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

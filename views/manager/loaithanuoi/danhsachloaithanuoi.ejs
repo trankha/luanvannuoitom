@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include partials/head.ejs %>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" class="init">
+		var sock = "";
+		var socket = io.connect("<%=conf%>"); //<%=conf%> chua duong dan socket
+        sock = socket;
+	</script>
+</head>
+<body onload="loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock)"; class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <% include partials/nav.ejs %>
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Bảng điều khiển
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+        <li><a href="/quanly/loaithanuoi/danhsachloaithanuoi">Danh sách loài thả nuôi</a></li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Start main activity -->
+      <div class="modal fade" tabindex="-1" id="modalNotifi" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="modal-title" id="gridSystemModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <p class="DateCreated"></p>
+                  <p class="RegionName"></p>
+                  <p class="StationName"></p>
+                  <p class="DataTypeName"></p>   
+                  <p class="DataValue"></p>
+                  <p class="ThresholdLevel"></p>
+                  <p class="ThresholdMessage"></p>
+                  <h3>Lời khuyên</h3>
+                  <p class="AdviceMessage"></p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+      <div class="padding-top-bottom">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel panel-primary">
+					<div class="panel-heading text-center">
+						<span id="tieude" style="font-weight:bold;color:white;font-size:16px;"><%=title%></span>
+					</div>
+					<div class="panel-body">
+						<form name="" action="/quanly/loaithanuoi/capnhatloaithanuoi" method="post">
+							<table id="example" class="table no-margin table-hover">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>Tên loài thả nuôi</th>
+										<th>Thao tác</th>
+									</tr>
+								</thead>
+								<tbody>
+									<% speciesdata.forEach(function(items){ %>
+									<tr>
+										<td><%= items.species_id %></td>
+										<td><%= items.species_name %></td>
+										<td>
+											<a href="/quanly/loaithanuoi/capnhatloaithanuoi/<%=items.species_id%>" title="cập nhật">
+												<span class="glyphicon glyphicon-pencil"></span>
+											</a>
+										</td>
+									</tr>
+									<% }); %>
+								</tbody>
+							</table>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="footer-title main-footer">
+    <div class="pull-right hidden-xs">
+      <b>Phiên bản</b> 1.0
+    </div>
+    <strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+  </footer>
+  <% include partials/scripts.ejs %>
+  <!-- Control Sidebar -->
+  <% include partials/sidebar.ejs %>
+</div>
+<!-- ./wrapper -->
+</body>
+</html>

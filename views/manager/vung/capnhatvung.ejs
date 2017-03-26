@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  	<%- include partials/head.ejs %>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			var sock = ""; //bien chua ket noi socket
+			var socket = io.connect("<%=conf%>");
+			sock = socket;
+			$(document).ready(function(){
+				
+			});
+		</script>
+	</head>
+	<body onload= "loadWARDSELECTED('<%=conf%>','<%=wardid%>');loadRealTime('<%=conf%>','<%=token%>','<%=secu%>','<%=userid%>',sock);" class="hold-transition skin-blue sidebar-mini">
+		<div class="wrapper">
+		  <% include partials/nav.ejs %>
+		  <!-- Content Wrapper. Contains page content -->
+		  <div class="content-wrapper">
+		    <!-- Content Header (Page header) -->
+		    <section class="content-header">
+		      <h1>
+		        Bảng điều khiển
+		      </h1>
+		      <ol class="breadcrumb">
+		        <li><a href="/"><i class="fa fa-dashboard"></i>Trang chủ</a></li>
+		        <li><a href="/quanly/vung/capnhatvung/<%= regData.region_id%>">Cập nhật vùng</a></li>
+		      </ol>
+		    </section>
+
+		    <!-- Main content -->
+		    <section class="content">
+		      <!-- Start main activity -->
+		       <div class="padding-top-bottom"></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-primary">
+							<div class="panel-heading text-center">
+								<span id="tieude" style="font-weight:bold;color:white;font-size:16px;">Cập nhật vùng</span>
+							</div>
+							<div class="panel-body">
+							<!-- Bo the  table-responsive do bi trung css giua bootstrap aminlte2 va sbadmin-->
+								<!-- <div class="table-responsive"> -->
+									<form name="" action="/quanly/vung/capnhatvung/" method="post">
+									<table class="table table-bordered">
+										<input type="text" value="<%= regData.region_id%>" style="display: none" id="idhide" name="region_id"/></td>
+										<tr>
+											<td class="text-right" style="font-weight:bold;">Tên vùng:</td>
+											<td><input type="text" value="<%= regData.region_name%>" class="form-control" id="region_name" name="region_name"/></td>
+										</tr>
+										<tr>
+											<td class="text-right" style="font-weight:bold;">Mô tả:</td>
+											<td><input type="text" value="<%= regData.region_description%>" class="form-control" id="region_description" name="region_description"/></td>
+										</tr>
+										<tr>
+											<td class="text-right" style="font-weight:bold;">Xã</td>
+											<td>
+												<select name="selectWARD" id="selectWARD" class="form-control">
+													<option class="form-control" value="-1">Chọn xã/phường</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td></td>
+											<td><input type="submit" class="btn btn-info" name="btnCapNhatVung" value="Cập nhật"/></td>
+										</tr>
+									</table>
+									</form>
+								<!-- </div> -->
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" tabindex="-1" id="modalNotifi" role="dialog" aria-labelledby="gridSystemModalLabel">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<h4 class="modal-title" id="modal-title" id="gridSystemModalLabel"></h4>
+							</div>
+							<div class="modal-body">
+								<div class="row">
+									<div class="col-md-12">
+										<p class="DateCreated"></p>
+										<p class="RegionName"></p>
+										<p class="StationName"></p>
+										<p class="DataTypeName"></p>   
+										<p class="DataValue"></p>
+										<p class="ThresholdLevel"></p>
+										<p class="ThresholdMessage"></p>
+										<h3>Lời khuyên</h3>
+										<p class="AdviceMessage"></p>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+							</div>
+						</div><!-- /.modal-content -->
+					</div><!-- /.modal-dialog -->
+				</div><!-- /.modal -->
+		    </section>
+		    <!-- /.content -->
+		  </div>
+		  <!-- /.content-wrapper -->
+		  <footer class="footer-title main-footer">
+		  	<div class="pull-right hidden-xs">
+		  		<b>Phiên bản</b> 1.0
+		  	</div>
+		  	<strong>Copyright &copy; Bộ môn Công Nghệ Phần Mềm,<a target="_blank" href="http://cit.ctu.edu.vn/"> Khoa CNTT & TT</a>, <a target="_blank" href="http://ctu.edu.vn/">Trường ĐH Cần Thơ</a>.</strong>
+		  </footer>
+		  <% include partials/scripts.ejs %>
+		  <!-- Control Sidebar -->
+		  <% include partials/sidebar.ejs %>
+		</div>
+	<!-- ./wrapper -->
+	</body>
+</html>
